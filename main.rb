@@ -1,6 +1,10 @@
 require_relative 'station'
 require_relative 'trains'
 require_relative 'route'
+require_relative 'passenger_train'
+require_relative 'passenger_cars'
+require_relative 'cargo_train'
+require_relative 'cargo_cars'
 
 class Main
   def initialize
@@ -182,17 +186,19 @@ class Main
     train = select_train
     return unless train
 
-    cargo_car = select_cargo_car(train)
-    return unless cargo_car
+    puts "Введите номер вагона для удаления: "
+    car_number = gets.chomp.to_i
 
-    train.delete_cars(cargo_car)
-    puts "Грузовой вагон удален"
+    car = train.passenger_cars.find { |car| car.number == car_number } if train.is_a?(PassengerTrain)
+    car = train.cargo_cars.find { |car| car.number == car_number } if train.is_a?(CargoTrain)
 
-    passenger_car = select_passenger_car(train)
-    return unless passenger_car
+    if car.nil?
+      puts "Вагон с номером #{car_number} не найден у поезда #{train.number}."
+      return
+    end
 
-    train.delete_cars(passenger_car)
-    puts "Пассажирский вагон удален"
+    train.delete_cars(car)
+    puts "Вагон с номером #{car_number} удален у поезда #{train.number}."
   end
 
   def move_train_forward
@@ -224,11 +230,13 @@ class Main
   def display_stations_and_trains
     puts "Список станций и поездов на них:"
 
-    @stations.each do |station|
-      puts "Станция: #{station.name}"
-      puts "Поезда на станции:"
-      station.trains.each { |train| display_train_info(train) }
-      puts "\n"
+    @routes.each do |route|
+      route.stations.each do |station|
+        puts "Станция: #{station.name}"
+        puts "Поезда на станции:"
+        station.trains.each { |train| display_train_info(train) }
+        puts "\n"
+      end
     end
   end
 
@@ -238,30 +246,24 @@ class Main
 
   def select_train
     puts "Выберите поезд:"
-    @trains.each_with_index { |train, index| puts "#{index + 1}. Поезд №#{train.number}" }
+    display_trains_list
     index = gets.chomp.to_i - 1
     @trains[index] if index.between?(0, @trains.size - 1)
   end
 
   def select_route
     puts "Выберите маршрут:"
-    @routes.each_with_index { |route, index| puts "#{index + 1}. #{route.display_route}" }
+    display_routes_list
     index = gets.chomp.to_i - 1
     @routes[index] if index.between?(0, @routes.size - 1)
   end
 
-  def select_cargo_car(train)
-    puts "Выберите вагон:"
-    @trains.cargo_cars.each_with_index { |car, index| puts "#{index + 1}. Вагон №#{car.number}" }
-    index = gets.chomp.to_i - 1
-    @trains[index] if index.between?(0, @trains.size - 1)
+  def display_trains_list
+    @trains.each_with_index { |train, index| puts "#{index + 1}. Поезд №#{train.number}" }
   end
 
-  def select_passenger_car(train)
-    puts "Выберите грузовой вагон:"
-    @trains.passenger_cars.each_with_index { |car, index| puts "#{index + 1}. Вагон №#{car.number}" }
-    index = gets.chomp.to_i - 1
-    @trains[index] if index.between?(0, @trains.size - 1)
+  def display_routes_list
+    @routes.each_with_index { |route, index| puts "#{index + 1}. #{route.display_route}" }
   end
 
   def choise_station
@@ -272,7 +274,7 @@ class Main
   end
 
   def add_station_to_route(route)
-    puts 'Введите станию для добавления'
+    puts 'Введите станцию для добавления'
     station = choise_station
     return unless station
 
@@ -281,7 +283,7 @@ class Main
   end
 
   def delete_station_to_route(route)
-    puts 'Введите станию для удаления'
+    puts 'Введите станцию для удаления'
     station = choise_station
     return unless station
 

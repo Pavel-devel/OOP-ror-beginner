@@ -21,7 +21,7 @@ class CargoTrain < Train
     cargo_cars.length
   end
 
-  def show_number_of_cars
+  def show_number_cargo_cars
     cargo_cars.each(&:number)
   end
 end

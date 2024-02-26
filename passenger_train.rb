@@ -21,7 +21,7 @@ class PassengerTrain < Train
     passenger_cars.length
   end
 
-  def show_number_of_cars
-    passenger_cars.map(&:number)
+  def show_number_passenger_cars
+    passenger_cars.each(&:number)
   end
 end

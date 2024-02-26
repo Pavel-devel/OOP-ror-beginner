@@ -30,11 +30,19 @@ class Train
   end
 
   def move_to_next_station
-    @current_station_index += 1 if next_station
+    return unless next_station
+
+    current_station.delete_train(self)
+    @current_station_index += 1
+    current_station.get_train(self)
   end
 
   def move_to_previous_station
-    @current_station_index -= 1 if previous_station
+    return unless previous_station
+
+    current_station.delete_train(self)
+    @current_station_index -= 1
+    current_station.get_train(self)
   end
 
   def at_terminal_station?
