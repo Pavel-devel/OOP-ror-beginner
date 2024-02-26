@@ -37,6 +37,22 @@ class Train
     @current_station_index -= 1 if previous_station
   end
 
+  def at_terminal_station?
+    current_station_index == route.stations.length - 1
+  end
+
+  def can_move_forward?
+    current_station_index < route.stations.length - 1
+  end
+
+  def at_initial_station?
+    current_station_index == 0
+  end
+
+  def can_move_backward?
+    current_station_index > 0
+  end
+
   # Эти методы не должны быть доступны в интерфейсе
   private
 
