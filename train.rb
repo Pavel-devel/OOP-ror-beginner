@@ -1,13 +1,24 @@
 class Train
   require_relative 'passenger_train'
   require_relative 'cargo_train'
+  require_relative 'manufacturer'
 
+  include Manufacturer
+  include InstanceCounter
   attr_reader :route
   attr_accessor :current_station_index, :number
+
+  @@trains = []
+
+  def self.find(number)
+    @@trains.find { |train| train.number == number }
+  end
 
   def initialize(number, _carriages)
     @number = number
     @speed = 0
+    @@trains << self
+    register_instance
   end
 
   def go
