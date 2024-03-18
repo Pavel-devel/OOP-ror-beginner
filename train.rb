@@ -1,12 +1,11 @@
 class Train
-  require_relative 'passenger_train'
-  require_relative 'cargo_train'
-  require_relative 'manufacturer'
-
+  include Validate
   include Manufacturer
   include InstanceCounter
   attr_reader :route
   attr_accessor :current_station_index, :number
+
+  NUMBER_FORMAT = /^[a-z\d]{3}-?[a-z\d]{2}$/i
 
   @@trains = []
 
@@ -19,6 +18,7 @@ class Train
     @speed = 0
     @@trains << self
     register_instance
+    validate!
   end
 
   def go
@@ -81,5 +81,12 @@ class Train
 
   def previous_station
     route.stations[@current_station_index - 1] if @current_station_index.positive?
+  end
+
+  def validate!
+    raise "Number can't be nill" if number.nil? || number.empty?
+    raise "Number should be at least 6 symbols" if number.length < 6
+    raise "Number has invalid format" if number !~ NUMBER_FORMAT
+    true
   end
 end

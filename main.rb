@@ -1,3 +1,6 @@
+require_relative 'instance_counter'
+require_relative 'manufacturer'
+require_relative 'validate'
 require_relative 'station'
 require_relative 'train'
 require_relative 'route'
@@ -69,25 +72,30 @@ class Main
   end
 
   def create_train
-    puts "Введите тип поезда: "
-    puts "1. Грузовой"
-    puts "2. Пассажирский"
-    type_train = gets.chomp.to_i
+    begin
+      puts "Введите тип поезда: "
+      puts "1. Грузовой"
+      puts "2. Пассажирский"
+      type_train = gets.chomp.to_i
 
-    puts "Введите номер поезда: "
-    train_number = gets.chomp
+      puts "Введите номер поезда: "
+      train_number = gets.chomp
 
-    case type_train
-    when 1
-      @trains << CargoTrain.new(train_number, 'Грузовой')
-    when 2
-      @trains << PassengerTrain.new(train_number, 'Пассажирский')
-    else
-      puts "Введите верный тип поезда"
-      return
+      case type_train
+      when 1
+        @trains << CargoTrain.new(train_number, 'Грузовой')
+      when 2
+        @trains << PassengerTrain.new(train_number, 'Пассажирский')
+      else
+        puts "Введите верный тип поезда"
+        return
+      end
+
+      puts "Поезд '#{train_number}' создан."
+    rescue RuntimeError => e
+      puts "Ошибка: #{e.message}"
+      retry
     end
-
-    puts "Поезд '#{train_number}' создан."
   end
 
   def create_route
