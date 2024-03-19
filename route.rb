@@ -36,10 +36,10 @@ class Route
   private
 
   def validate!
+    start_station = stations.first.to_s
+    finish_station = stations.last.to_s
     raise "Name route can't be nill" if start_station.nil? || start_station.empty?
     raise "Name route can't be nill" if finish_station.nil? || finish_station.empty?
-    raise "Name route should be at least 2 symbols" if start_station.length < 2
-    raise "Name route should be at least 2 symbols" if finish_station.length < 2
     true
   end
 end

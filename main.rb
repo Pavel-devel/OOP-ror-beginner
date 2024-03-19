@@ -65,10 +65,15 @@ class Main
   private
 
   def create_station
-    puts "Введите название станции: "
-    name = gets.chomp
-    @stations << Station.new(name)
-    puts "Станция '#{name}' создана."
+    begin
+      puts "Введите название станции: "
+      name = gets.chomp
+      @stations << Station.new(name)
+      puts "Станция '#{name}' создана."
+    rescue RuntimeError => e
+      puts "Ошибка: #{e.message}"
+      retry
+    end
   end
 
   def create_train
@@ -99,28 +104,33 @@ class Main
   end
 
   def create_route
-    puts "Начальная станция."
-    start_station = choise_station
+    begin
+      puts "Начальная станция."
+      start_station = choise_station
 
-    puts "Конечная станция."
-    finish_station = choise_station
+      puts "Конечная станция."
+      finish_station = choise_station
 
-    route = Route.new(start_station, finish_station)
+      route = Route.new(start_station, finish_station)
 
-    loop do
-      puts 'Хотите добавить промежуточную станцию? (yes/no)'
-      choise = gets.chomp
-      break if choise == 'no'
+      loop do
+        puts 'Хотите добавить промежуточную станцию? (yes/no)'
+        choise = gets.chomp
+        break if choise == 'no'
 
-      puts 'Введите название промежуточной станции: '
-      intermediate_station_name = gets.chomp
-      intermediate_station = Station.new(intermediate_station_name)
-      route.add_station(intermediate_station)
+        puts 'Введите название промежуточной станции: '
+        intermediate_station_name = gets.chomp
+        intermediate_station = Station.new(intermediate_station_name)
+        route.add_station(intermediate_station)
+      end
+
+      @routes << route
+
+      route.display_route
+    rescue RuntimeError => e
+      puts "Ошибка: #{e.message}"
+      retry
     end
-
-    @routes << route
-
-    route.display_route
   end
 
   def manage_route_stations
@@ -158,36 +168,41 @@ class Main
   end
 
   def add_car_to_train
-    train = select_train
-    return unless train
+    begin
+      train = select_train
+      return unless train
 
-    puts "Введите тип вагона: "
-    puts "1. Грузовой"
-    puts "2. Пассажирский"
-    type_cars = gets.chomp.to_i
+      puts "Введите тип вагона: "
+      puts "1. Грузовой"
+      puts "2. Пассажирский"
+      type_cars = gets.chomp.to_i
 
-    puts "Введите номер вагона: "
-    number_car = gets.chomp.to_i
+      puts "Введите номер вагона: "
+      number_car = gets.chomp
 
-    puts "Введите обьем грузового вагона: " if type_cars == 1
-    capacity = gets.chomp.to_i
+      puts "Введите обьем грузового вагона: " if type_cars == 1
+      capacity = gets.chomp.to_i
 
-    puts "Введите количество мест пассажирского вагона: " if type_cars == 2
-    seats = gets.chomp.to_i
+      puts "Введите количество мест пассажирского вагона: " if type_cars == 2
+      seats = gets.chomp.to_i
 
-    case type_cars
-    when 1
-      cargo_car = CargoCars.new(number_car, capacity)
-      train.add_cargo_cars_train(cargo_car)
-    when 2
-      passenger_car = PassengerCars.new(number_car, seats)
-      train.add_passenger_cars_train(passenger_car)
-    else
-      puts "Введите верный тип вагона"
-      return
+      case type_cars
+      when 1
+        cargo_car = CargoCars.new(number_car, capacity)
+        train.add_cargo_cars_train(cargo_car)
+      when 2
+        passenger_car = PassengerCars.new(number_car, seats)
+        train.add_passenger_cars_train(passenger_car)
+      else
+        puts "Введите верный тип вагона"
+        return
+      end
+
+      puts "Вагон добавлен"
+    rescue RuntimeError => e
+      puts "Ошибка: #{e.message}"
+      retry
     end
-
-    puts "Вагон добавлен"
   end
 
   def remove_car_from_train
